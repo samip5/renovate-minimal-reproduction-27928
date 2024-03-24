@@ -10,7 +10,7 @@
   "timezone": "Europe/Helsinki",
   "semanticCommits": "enabled",
   "rebaseWhen": "conflicted",
-  "enabledManagers": ["ansible", "ansible-galaxy", "regex"]
+  "enabledManagers": ["ansible", "ansible-galaxy", "regex"],
   "customManagers": [
     {
       "description": "Update some deps",
