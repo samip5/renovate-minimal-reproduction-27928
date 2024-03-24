@@ -1,0 +1,13 @@
+- hosts: satama.n.<snip>.fi
+  become: yes
+  roles:
+    - name: uumas.docker.container
+      docker_service: powerdnsadmin
+      docker_image: powerdnsadmin/pda-legacy:v0.4.2 # renovate: datasource=docker depName=powerdnsadmin/pda-legacy
+      docker_image_http_port: 80
+      docker_volumes:
+        - powerdnsadmin_data:/data
+      docker_env:
+        SECRET_KEY: "{{ powerdnsadmin_secret }}"
+        SQLALCHEMY_DATABASE_URI: "postgres://powerdnsadmin:{{ database_passwords.powerdnsadmin }}@powerdnsadmin_db/powerdnsadmin"
+      docker_database: postgres

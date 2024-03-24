@@ -1,0 +1,11 @@
+---
+
+collections:
+  - name: uumas.docker
+    version: 0.9.0
+  - name: pikaviestin.matrix
+    version: '>=0.0.6'
+
+roles:
+  - name: lae.netbox
+    version: v1.0.4

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:enableMajor",
+    ":disableRateLimiting",
+    ":semanticCommits"
+  ],
+  "commitBodyTable": true,
+  "timezone": "Europe/Helsinki",
+  "semanticCommits": "enabled",
+  "rebaseWhen": "conflicted",
+  "enabledManagers": ["ansible", "ansible-galaxy", "regex"],
+  "regexManagers": [
+   {
+    "description": "Process various other dependencies",
+    "fileMatch": [
+      "(^|/)playbooks/.+\\.ya?ml(\\.j2)?(\\.j2)?$"
+     ],
+    "matchStrings": [
+      // Example: `k3s_release_version: "v1.27.3+k3s1"`
+      "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\n.*?\"(?<currentValue>.*)\"\n",
+      // Example: `- https://github.com/rancher/system-upgrade-controller/releases/download/v0.11.0/crd.yaml`
+      "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\n.*?-\\s(.*?)\/(?<currentValue>[^/]+)\/[^/]+\n",
+      // Example: apiVersion=helm.cattle.io/v1 kind=HelmChart
+      "datasource=(?<datasource>\\S+)\n.*?repo: (?<registryUrl>\\S+)\n.*?chart: (?<depName>\\S+)\n.*?version: (?<currentValue>\\S+)\n"
+    ],
+    "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
+    "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+   }
+  ],
+  "customManagers": [
+    {
+      "description": "Update some deps",
+      "customType": "regex",
+      "fileMatch": ["(^|/)playbooks/.+\\.ya?ml(\\.j2)?(\\.j2)?$"],
+      "matchStrings": [
+        "\\s+docker_image: [^:]+:(?<currentValue>[^#]+)\\b # renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>.+?))?\\s",
+        "\\s+docker_image: [^:]+:(?<currentValue>[^#]+@[^\\s]+)\\b # renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>.+?))?\\s"
+      ],
+      "datasourceTemplate": "{{{datasource}}}",
+      "autoReplaceStringTemplate": "docker_image: {{{depName}}}:{{{newValue}}}",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "enabled": true,
+      "commitMessageTopic": "container image {{depName}}",
+      "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
+      "matchUpdateTypes": ["major", "minor", "patch"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "semanticCommitScope": "images",
+      "commitMessageTopic": "{{depName}}",
+      "commitMessageExtra": "to {{{newValue}}}",
+      "separateMinorPatch": true
+    }
+  ]
+}

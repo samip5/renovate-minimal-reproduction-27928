@@ -1,0 +1,16 @@
+---
+- hosts: satama.n.<snip>.fi
+  become: yes
+  roles:
+    - name: uumas.docker.container
+      docker_service: renovate
+      docker_image: docker.io/renovate/renovate:37 # renovate: datasource=docker depName=docker.io/renovate/renovate versioning=loose
+      docker_env:
+        RENOVATE_PLATFORM: "bitbucket-server"
+        RENOVATE_ENDPOINT: "https://ruoska.<snip>.fi/bitbucket/"
+        RENOVATE_USERNAME: "renovate-bot"
+        RENOVATE_PASSWORD: "{{ renovate_token }}"
+        # RENOVATE_AUTODISCOVER: "true"
+        RENOVATE_REPOSITORIES: "ans/ansible"
+        LOG_LEVEL: "debug"
+      reverse_proxy_type: none

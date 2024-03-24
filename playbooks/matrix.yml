@@ -1,0 +1,13 @@
+---
+- hosts: satama.n.<snip>
+  become: true
+  roles:
+    - name: uumas.docker.container
+      docker_service: matrix_syncv3
+      docker_image: ghcr.io/matrix-org/sliding-sync:v0.99.12 # renovate: datasource=docker depName=ghcr.io/matrix-org/sliding-sync
+      docker_image_http_port: 8008
+      docker_env:
+        SYNCV3_SERVER: https://matrix.kapsi.fi
+        SYNCV3_SECRET: "{{ matrix_syncv3_secret }}"
+        SYNCV3_BINDADDR: :8008
+        SYNCV3_DB: "user=matrix_syncv3 password={{ database_passwords.matrix_syncv3 }} dbname=matrix_syncv3 sslmode=disable host=psql1.n.kapsi.fi"
