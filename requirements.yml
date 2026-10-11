@@ -2,7 +2,7 @@
 
 collections:
   - name: uumas.docker
-    version: 0.9.0
+    version: 0.10.2
   - name: pikaviestin.matrix
     version: '>=0.0.6'
 
